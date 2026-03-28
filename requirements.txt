@@ -1,0 +1,9 @@
+torch
+transformers
+faiss-cpu
+pandas
+numpy
+pillow
+requests
+tqdm
+scikit-learn
