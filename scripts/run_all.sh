@@ -2,6 +2,8 @@
 set -euo pipefail
 
 export PYTHONPATH="${PYTHONPATH:-}:src"
+export KMP_DUPLICATE_LIB_OK="${KMP_DUPLICATE_LIB_OK:-TRUE}"
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-1}"
 
 python src/prepare_data.py --max-items "${MAX_ITEMS:-2000}"
 python src/encode_text.py

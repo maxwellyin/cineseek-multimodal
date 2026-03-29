@@ -5,6 +5,11 @@ from pathlib import Path
 import faiss
 import numpy as np
 
+try:
+    faiss.omp_set_num_threads(1)
+except AttributeError:
+    pass
+
 
 def build_ip_index(embeddings: np.ndarray) -> faiss.Index:
     matrix = np.ascontiguousarray(embeddings.astype("float32"))

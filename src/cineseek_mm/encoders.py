@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import torch
@@ -20,6 +21,40 @@ def load_clip():
     return model, processor, device
 
 
+def _feature_tensor(output: Any, model: CLIPModel, modality: str) -> torch.Tensor:
+    if isinstance(output, torch.Tensor):
+        return output
+
+    embed_attr = f"{modality}_embeds"
+    if hasattr(output, embed_attr):
+        embeds = getattr(output, embed_attr)
+        if embeds is not None:
+            return embeds
+
+    if hasattr(output, "pooler_output") and output.pooler_output is not None:
+        pooled = output.pooler_output
+        if (
+            modality == "text"
+            and hasattr(model, "text_projection")
+            and pooled.shape[-1] == model.text_projection.in_features
+        ):
+            return model.text_projection(pooled)
+        if (
+            modality == "image"
+            and hasattr(model, "visual_projection")
+            and pooled.shape[-1] == model.visual_projection.in_features
+        ):
+            return model.visual_projection(pooled)
+        return pooled
+
+    if isinstance(output, tuple) and output:
+        first = output[0]
+        if isinstance(first, torch.Tensor):
+            return first
+
+    raise TypeError(f"Unsupported CLIP {modality} output type: {type(output)!r}")
+
+
 def _to_numpy(tensor: torch.Tensor) -> np.ndarray:
     tensor = F.normalize(tensor, dim=-1)
     return tensor.detach().cpu().numpy().astype("float32")
@@ -32,7 +67,7 @@ def encode_texts(texts: list[str], batch_size: int = 64) -> np.ndarray:
         for start in tqdm(range(0, len(texts), batch_size), desc="Encoding text"):
             batch = texts[start : start + batch_size]
             inputs = processor(text=batch, padding=True, truncation=True, return_tensors="pt").to(device)
-            features = model.get_text_features(**inputs)
+            features = _feature_tensor(model.get_text_features(**inputs), model, "text")
             outputs.append(_to_numpy(features))
     return np.vstack(outputs) if outputs else np.empty((0, model.config.projection_dim), dtype="float32")
 
@@ -64,7 +99,7 @@ def encode_images(paths: list[str | Path], batch_size: int = 64) -> tuple[np.nda
             if not images:
                 continue
             inputs = processor(images=images, return_tensors="pt").to(device)
-            features = model.get_image_features(**inputs)
+            features = _feature_tensor(model.get_image_features(**inputs), model, "image")
             outputs.append(_to_numpy(features))
 
     valid_embeddings = np.vstack(outputs) if outputs else np.empty((0, model.config.projection_dim), dtype="float32")
