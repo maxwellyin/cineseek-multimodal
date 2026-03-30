@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.request import urlretrieve
 
@@ -71,9 +72,10 @@ def prepare_tables(max_items: int | None = None) -> tuple[pd.DataFrame, pd.DataF
     movies = pd.read_csv(RAW_MOVIES_PATH, sep="\t", compression="gzip", quoting=csv.QUOTE_MINIMAL)
     for column in TEXT_COLUMNS + ["poster_url"]:
         movies[column] = movies[column].map(sanitize_text)
-    movies = movies[movies["title"].map(bool) & movies["poster_url"].map(bool)].copy()
+    movies = movies[movies["title"].map(bool)].copy()
     movies["title_text"] = movies.apply(build_title_text, axis=1)
     movies["metadata_text"] = movies.apply(build_metadata_text, axis=1)
+    movies = movies[(movies["overview"].str.len() >= 20) | movies["tags"].map(bool)].copy()
     movies = movies.reset_index(drop=True)
     if max_items is not None:
         movies = movies.head(max_items).copy()
@@ -98,18 +100,40 @@ def prepare_tables(max_items: int | None = None) -> tuple[pd.DataFrame, pd.DataF
     return movies, queries
 
 
-def download_posters(movies: pd.DataFrame, sleep_seconds: float = 0.02, timeout: int = 20) -> None:
+def _download_one_poster(row, timeout: int = 20) -> tuple[bool, str]:
+    path = Path(row.poster_path)
+    if path.exists() and path.stat().st_size > 0:
+        return True, ""
+    try:
+        response = requests.get(row.poster_url, timeout=timeout)
+        response.raise_for_status()
+        path.write_bytes(response.content)
+        return True, ""
+    except Exception as exc:
+        return False, f"Skipping poster for {row.title}: {exc}"
+
+
+def download_posters(
+    movies: pd.DataFrame,
+    sleep_seconds: float = 0.02,
+    timeout: int = 20,
+    workers: int = 1,
+) -> None:
     POSTER_DIR.mkdir(parents=True, exist_ok=True)
+    if workers > 1:
+        rows = list(movies.itertuples(index=False))
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(_download_one_poster, row, timeout) for row in rows]
+            for future in tqdm(as_completed(futures), total=len(futures), desc="Downloading posters"):
+                ok, message = future.result()
+                if not ok and message:
+                    print(message)
+        return
+
     for row in tqdm(movies.itertuples(index=False), total=len(movies), desc="Downloading posters"):
-        path = Path(row.poster_path)
-        if path.exists() and path.stat().st_size > 0:
-            continue
-        try:
-            response = requests.get(row.poster_url, timeout=timeout)
-            response.raise_for_status()
-            path.write_bytes(response.content)
-        except Exception as exc:
-            print(f"Skipping poster for {row.title}: {exc}")
+        ok, message = _download_one_poster(row, timeout=timeout)
+        if not ok and message:
+            print(message)
         if sleep_seconds > 0:
             time.sleep(sleep_seconds)
 
