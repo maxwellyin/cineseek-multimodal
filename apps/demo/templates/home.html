@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CineSeek-MM Local Demo</title>
+  <style>
+    :root {
+      --bg: #111827;
+      --panel: #f5efe2;
+      --card: #fffaf0;
+      --ink: #172033;
+      --muted: #637083;
+      --line: rgba(23, 32, 51, 0.14);
+      --accent: #c85f32;
+      --accent-dark: #8a3417;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 196, 87, 0.24), transparent 25%),
+        radial-gradient(circle at 86% 14%, rgba(80, 130, 190, 0.30), transparent 26%),
+        linear-gradient(135deg, #111827 0%, #243142 48%, #3d281d 100%);
+      font-family: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      min-height: 100vh;
+    }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: rgba(245, 239, 226, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      backdrop-filter: blur(18px);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent-dark);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font: 800 0.74rem ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      max-width: 9ch;
+      font-size: clamp(2.7rem, 7vw, 5.6rem);
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.55rem;
+    }
+
+    .lede, label, .hint, .meta, .overview {
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.75;
+      margin: 0;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 7px;
+    }
+
+    textarea, select, input[type="number"], input[type="file"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--ink);
+      padding: 13px 15px;
+      font: 500 1rem ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+      line-height: 1.55;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .button {
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--accent), #ec8958);
+      color: white;
+      padding: 14px 22px;
+      font: 850 1rem ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      cursor: pointer;
+    }
+
+    .hint {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .results {
+      margin-top: 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .result-card {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 18px;
+      background: rgba(255, 250, 240, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 16px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.10);
+    }
+
+    .poster {
+      width: 96px;
+      min-height: 140px;
+      border-radius: 16px;
+      background: #e7decd;
+      object-fit: cover;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    .rank {
+      color: var(--accent-dark);
+      font-weight: 900;
+      margin-right: 8px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 5px 0 8px;
+    }
+
+    .overview {
+      color: #334155;
+      font-size: 0.94rem;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .error {
+      margin-top: 18px;
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+
+    @media (max-width: 860px) {
+      .hero, .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .result-card {
+        grid-template-columns: 72px 1fr;
+      }
+
+      .poster {
+        width: 72px;
+        min-height: 104px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="panel">
+        <p class="eyebrow">CineSeek-MM Local Demo</p>
+        <h1>Search by words, posters, or both.</h1>
+        <p class="lede">
+          A local-only qualitative interface for the multimodal retrieval experiments.
+          Use text queries, upload a poster/image, or combine both with tuned fusion.
+        </p>
+        <p class="hint">
+          This demo is intentionally local. It is for inspection and error analysis, not production deployment.
+        </p>
+      </div>
+
+      <div class="panel">
+        <form class="form-grid" action="/search" method="post" enctype="multipart/form-data">
+          <div>
+            <label for="query">Text query</label>
+            <textarea id="query" name="query" placeholder="dark sci-fi movies with neon city visuals">{{ query }}</textarea>
+          </div>
+
+          <div>
+            <label for="image">Poster / image query</label>
+            <input id="image" name="image" type="file" accept="image/*">
+            <p class="hint">Required for image and hybrid modes. Try a movie poster or a visual mood image.</p>
+          </div>
+
+          <div class="two-col">
+            <div>
+              <label for="mode">Mode</label>
+              <select id="mode" name="mode">
+                <option value="text" {% if mode == "text" %}selected{% endif %}>Text</option>
+                <option value="image" {% if mode == "image" %}selected{% endif %}>Image</option>
+                <option value="hybrid" {% if mode == "hybrid" %}selected{% endif %}>Hybrid</option>
+              </select>
+            </div>
+            <div>
+              <label for="image_weight">Image weight</label>
+              <input id="image_weight" name="image_weight" type="number" step="0.01" min="0" max="1" value="{{ image_weight }}">
+              <p class="hint">Validation sweep selected 0.05 for MSRD text relevance.</p>
+            </div>
+          </div>
+
+          <button class="button" type="submit">Retrieve Movies</button>
+        </form>
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+      </div>
+    </section>
+
+    {% if results %}
+      <section class="results">
+        {% for item in results %}
+          <article class="result-card">
+            {% if item.poster_url %}
+              <img class="poster" src="{{ item.poster_url }}" alt="Poster for {{ item.title }}">
+            {% else %}
+              <div class="poster"></div>
+            {% endif %}
+            <div>
+              <h2><span class="rank">#{{ loop.index }}</span>{{ item.title }}</h2>
+              <div class="meta">
+                score={{ "%.4f"|format(item.score) }}
+                {% if item.genres %} · {{ item.genres }}{% endif %}
+                {% if item.director %} · {{ item.director }}{% endif %}
+              </div>
+              {% if item.overview %}
+                <p class="overview">{{ item.overview[:360] }}{% if item.overview|length > 360 %}...{% endif %}</p>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </section>
+    {% endif %}
+  </main>
+</body>
+</html>

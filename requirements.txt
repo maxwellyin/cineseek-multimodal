@@ -7,3 +7,7 @@ pillow
 requests
 tqdm
 scikit-learn
+fastapi
+uvicorn
+jinja2
+python-multipart

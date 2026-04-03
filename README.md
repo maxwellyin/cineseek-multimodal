@@ -111,6 +111,32 @@ Or run the full Phase 1 pipeline:
 bash scripts/run_all.sh
 ```
 
+## Local Qualitative Demo
+
+CineSeek-MM includes a local-only FastAPI demo for qualitative inspection and error analysis. It is not intended for deployment.
+
+Start it after embeddings and indexes have been built:
+
+```bash
+source .venv/bin/activate
+PYTHONPATH=src KMP_DUPLICATE_LIB_OK=TRUE OMP_NUM_THREADS=1 \
+  uvicorn apps.demo.app:app --host 127.0.0.1 --port 8010 --reload
+```
+
+Open:
+
+```text
+http://127.0.0.1:8010
+```
+
+Supported modes:
+
+- `Text`: text query -> movie metadata index.
+- `Image`: uploaded poster/image -> poster image index.
+- `Hybrid`: text query + uploaded image -> fused query embedding.
+
+The default hybrid image weight is `0.05`, selected by validation sweep on the original CineSeek split.
+
 ## Experiments
 
 Recommended comparisons:
