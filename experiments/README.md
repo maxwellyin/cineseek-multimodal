@@ -6,8 +6,8 @@ Phase 1 fair comparison against the original CineSeek split:
 
 | Mode | recall@10 | recall@50 | recall@100 | MRR | NDCG | avg encode ms | avg search ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| original CineSeek trained dual-tower, val | 0.528 | 0.697 | 0.755 | 0.363 | 0.443 | N/A | N/A |
-| original CineSeek trained dual-tower, test | 0.537 | 0.688 | 0.747 | 0.351 | 0.433 | N/A | N/A |
+| original CineSeek raw sentence-transformer, val | 0.944 | 0.970 | 0.976 | 0.828 | 0.862 | N/A | N/A |
+| original CineSeek raw sentence-transformer, test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | N/A | N/A |
 | frozen CLIP text, val | 0.820 | 0.864 | 0.884 | 0.736 | 0.767 | 2.23 | 0.033 |
 | frozen CLIP text, test | 0.840 | 0.881 | 0.897 | 0.747 | 0.780 | 1.90 | 0.031 |
 | frozen CLIP hybrid tuned on val (`image_weight=0.05`), val | 0.821 | 0.867 | 0.883 | 0.736 | 0.768 | cached | 0.028 |
@@ -26,7 +26,8 @@ Run settings:
 Interpretation:
 
 - The earlier 2000-item result was not a fair comparison because the candidate pool was smaller.
-- On the aligned 9692-item candidate pool and original split, frozen CLIP text still outperforms the trained CineSeek dual-tower checkpoint.
+- On the aligned 9692-item candidate pool and original split, the current original CineSeek raw sentence-transformer baseline remains strongest for text-only search.
+- Frozen CLIP is useful here because it enables poster and hybrid retrieval, not because it replaces the best text-only baseline.
 - The default hybrid fusion weight (`image_weight=0.35`) hurts MRR/NDCG relative to text-only, so image fusion needs validation-set tuning rather than a fixed hand-picked value.
 - Validation sweep selected `image_weight=0.05`, which gives a tiny recall@10 lift over text-only but does not improve MRR/NDCG. This suggests poster features are useful only as a weak auxiliary signal for the MSRD text-query task.
 
