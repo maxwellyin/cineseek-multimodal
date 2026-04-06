@@ -15,7 +15,7 @@ except ImportError:
 
 
 APP_DIR = Path(__file__).resolve().parent
-app = FastAPI(title="CineSeek-MM Local Demo")
+app = FastAPI(title="CineSeek-MM Demo")
 templates = Jinja2Templates(directory=str(APP_DIR / "templates"))
 
 

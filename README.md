@@ -10,7 +10,7 @@ This repo is intentionally more technical than product-facing. The original Cine
 - **PyTorch / CLIP pipeline**: batched CLIP text and image encoding with normalized 512-d embeddings.
 - **FAISS serving path**: precomputed item embeddings and low-latency nearest-neighbor search.
 - **Evaluation discipline**: text-only, hybrid, image-identity, and MSRD-aligned poster-query evaluations.
-- **Local qualitative demo**: a non-deployed FastAPI UI for inspecting text/image/hybrid retrieval behavior.
+- **Demo interface**: a FastAPI UI for showcasing and inspecting text/image/hybrid retrieval behavior.
 
 ## System Design
 
@@ -25,17 +25,6 @@ Movie poster   -> CLIP image encoder /
 ```
 
 The item collection contains `9,692` movies. Poster coverage is `99.4%`, and both metadata and poster embeddings are stored as `9692 x 512` matrices.
-
-## Why This Is Separate From CineSeek
-
-CineSeek and CineSeek-MM serve different portfolio roles:
-
-| Project | Role | Main Signal |
-| --- | --- | --- |
-| CineSeek | Deployed product demo | FastAPI, FAISS retrieval, LLM agent, Docker deployment |
-| CineSeek-MM | Technical ML system | CLIP, multimodal embeddings, PyTorch encoding, retrieval evaluation |
-
-The original CineSeek demo remains the better public-facing product. CineSeek-MM is useful because it exposes the modeling and evaluation layer behind a multimodal retrieval system.
 
 ## Methods
 
@@ -55,8 +44,8 @@ This evaluates natural-language text queries against the same MSRD validation/te
 
 | Model | Split | recall@10 | recall@50 | recall@100 | MRR | NDCG | encode ms | search ms |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| original CineSeek sentence-transformer | val | 0.944 | 0.970 | 0.976 | 0.828 | 0.862 | N/A | N/A |
-| original CineSeek sentence-transformer | test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | N/A | N/A |
+| original CineSeek sentence-transformer | val | 0.944 | 0.970 | 0.976 | 0.828 | 0.862 | 0.67 | 0.056 |
+| original CineSeek sentence-transformer | test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | 0.61 | 0.058 |
 | frozen CLIP text | val | 0.820 | 0.864 | 0.884 | 0.736 | 0.767 | 2.23 | 0.033 |
 | frozen CLIP text | test | 0.840 | 0.881 | 0.897 | 0.747 | 0.780 | 1.90 | 0.031 |
 | frozen CLIP hybrid, tuned `image_weight=0.05` | val | 0.821 | 0.867 | 0.883 | 0.736 | 0.768 | cached | 0.028 |
@@ -118,7 +107,7 @@ Takeaway: poster-only input can recover related movies from the same relevance s
 cineseek-multimodal/
 ├── README.md
 ├── requirements.txt
-├── apps/demo/                  # local qualitative demo
+├── apps/demo/                  # FastAPI demo interface
 ├── data/
 │   ├── processed/              # movie/query tables and embeddings
 │   └── posters/                # downloaded poster subset/full set
@@ -205,9 +194,13 @@ Saved outputs live in `experiments/`:
 - `image_msrd_val_first.json`
 - `image_msrd_test_first.json`
 
-## Local Qualitative Demo
+## Demo Interface
 
-CineSeek-MM includes a FastAPI demo for qualitative inspection of text, image, and hybrid retrieval.
+CineSeek-MM includes a FastAPI demo for showcasing and inspecting text, image, and hybrid retrieval. It supports natural-language queries, poster/image uploads, and validation-tuned fusion.
+
+![CineSeek-MM input interface](docs/images/cineseek-mm-demo-input.png)
+
+![CineSeek-MM retrieval results](docs/images/cineseek-mm-demo-results.png)
 
 ```bash
 source .venv/bin/activate
@@ -227,7 +220,7 @@ Supported modes:
 - `Image`: uploaded poster/image -> poster image index
 - `Hybrid`: text query + uploaded image -> fused query embedding
 
-The default local demo image weight is `0.05`, matching the validation sweep.
+The default demo image weight is `0.05`, matching the validation sweep.
 
 ## Resume Framing
 

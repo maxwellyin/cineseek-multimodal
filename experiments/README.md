@@ -6,8 +6,8 @@ Phase 1 fair comparison against the original CineSeek split:
 
 | Mode | recall@10 | recall@50 | recall@100 | MRR | NDCG | avg encode ms | avg search ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| original CineSeek sentence-transformer, val | 0.944 | 0.970 | 0.976 | 0.828 | 0.862 | N/A | N/A |
-| original CineSeek sentence-transformer, test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | N/A | N/A |
+| original CineSeek sentence-transformer, val | 0.944 | 0.970 | 0.976 | 0.828 | 0.862 | 0.67 | 0.056 |
+| original CineSeek sentence-transformer, test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | 0.61 | 0.058 |
 | frozen CLIP text, val | 0.820 | 0.864 | 0.884 | 0.736 | 0.767 | 2.23 | 0.033 |
 | frozen CLIP text, test | 0.840 | 0.881 | 0.897 | 0.747 | 0.780 | 1.90 | 0.031 |
 | frozen CLIP hybrid tuned on val (`image_weight=0.05`), val | 0.821 | 0.867 | 0.883 | 0.736 | 0.768 | cached | 0.028 |
@@ -22,6 +22,7 @@ Run settings:
 - `CLIP_MODEL=openai/clip-vit-base-patch32`
 - `FAISS=IndexFlatIP`
 - `OMP_NUM_THREADS=1`
+- latency measured on CPU with batch size 64 and online query encoding
 
 Interpretation:
 
