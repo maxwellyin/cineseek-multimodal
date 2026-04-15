@@ -44,8 +44,8 @@ This evaluates natural-language text queries against the same MSRD validation/te
 
 | Model | Split | recall@10 | recall@50 | recall@100 | MRR | NDCG | encode ms | search ms |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| original CineSeek sentence-transformer | val | 0.944 | 0.970 | 0.976 | 0.828 | 0.862 | 0.67 | 0.056 |
-| original CineSeek sentence-transformer | test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | 0.61 | 0.058 |
+| original CineSeek sentence-transformer | val | 0.944 | 0.970 | 0.976 | 0.828 | 0.862 | 0.67 | 0.044 |
+| original CineSeek sentence-transformer | test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | 0.61 | 0.042 |
 | frozen CLIP text | val | 0.820 | 0.864 | 0.884 | 0.736 | 0.767 | 2.23 | 0.033 |
 | frozen CLIP text | test | 0.840 | 0.881 | 0.897 | 0.747 | 0.780 | 1.90 | 0.031 |
 | frozen CLIP hybrid, tuned `image_weight=0.05` | val | 0.821 | 0.867 | 0.883 | 0.736 | 0.768 | cached | 0.028 |
