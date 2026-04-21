@@ -10,8 +10,8 @@ Phase 1 fair comparison against the original CineSeek split:
 | original CineSeek sentence-transformer, test | 0.931 | 0.963 | 0.973 | 0.829 | 0.862 | 0.61 | 0.042 |
 | frozen CLIP text, val | 0.820 | 0.864 | 0.884 | 0.736 | 0.767 | 2.23 | 0.033 |
 | frozen CLIP text, test | 0.840 | 0.881 | 0.897 | 0.747 | 0.780 | 1.90 | 0.031 |
-| frozen CLIP hybrid tuned on val (`image_weight=0.05`), val | 0.821 | 0.867 | 0.883 | 0.736 | 0.768 | cached | 0.028 |
-| frozen CLIP hybrid tuned on val (`image_weight=0.05`), test | 0.841 | 0.882 | 0.897 | 0.746 | 0.779 | cached | 0.028 |
+| frozen CLIP hybrid tuned on val (`image_weight=0.05`), val | 0.821 | 0.867 | 0.883 | 0.736 | 0.768 | 2.61 | 0.051 |
+| frozen CLIP hybrid tuned on val (`image_weight=0.05`), test | 0.841 | 0.882 | 0.897 | 0.746 | 0.779 | 1.96 | 0.056 |
 | frozen CLIP hybrid, val | 0.806 | 0.862 | 0.884 | 0.702 | 0.741 | 2.04 | 0.031 |
 | frozen CLIP hybrid, test | 0.827 | 0.876 | 0.891 | 0.706 | 0.747 | 1.75 | 0.031 |
 
